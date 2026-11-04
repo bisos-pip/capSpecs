@@ -1,0 +1,81 @@
+#+title: Development Status & Continuation Handoff
+#+TAGS: me ai aiAndMe
+
+# Provenance (installed once by aiActivity.cs --- not regenerated):
+#   Date:      2026-11-04T15:58:24+00:00
+#   User:      bystar
+#   Templates: /bisos/apps/defaults/ai-templates
+#   Command:   /bisos/venv/py3/devbin/aiActivity.cs -i initiate --activity=bisos-pip
+
+####+BEGIN: b:ai:file/particulars
+* AI Working Context
+  Working Directory: /bisos/git/auth/bxRepos/bisos-pip/capSpecs
+  File: /bisos/git/auth/bxRepos/bisos-pip/capSpecs/AI-DevStatus.org
+  Activity: bisos-pip
+  Companion Docs: AI-WORKFLOW.org, AI-Activity.org, AI-DevStatus.org, README.org
+####+END:
+
+This file is a working-state handoff so development can continue on another
+machine (which has this repo but NOT the developer's =~=). It captures the
+architecture, what works, what is untested and the design decisions made so far.
+
+This file is maintained by Claude. Updates are typically triggered by the
+=/bx-status-update= slash command, after major interactions, or before a release.
+
+Note to a fresh Claude: this file is intentionally sparse at project start.
+Fill in the sections below when asked to update, following the structure provided.
+
+* Current State
+
+As of 2026-11-04 nothing is implemented. =bisos.capSpecs= is a scaffold (=py3/bin/null-cbs-induct.cs=,
+=null-assemble.cs=, =null-binsPrep.cs=, an empty =py3/bisos/capSpecs/__init__.py=); it is installed
+editable in =/bisos/venv/py3/dev-bisos3=. What exists is the plan, in AI-WorkPlan.org, and the rewritten
+=README.org= (it had been a copy of the facter README).
+
+Purpose: CBM facilities for capabilities that are in BISOS but not implemented in a package of their own;
+the CBM machinery is in =bisos.capability=. Planned, all of capabilityType =induct= in realm =collective=
+(leaves under =sys/cbm/collective/induct/=):
+- Stage 2 =pltfrmDevelBecome=: after a rawBisos install, git =anon= to =auth= and pip PyPI to editable.
+- Stage 3 =pltfrmDevelCreds= (placeholder): the credentials it needs (=~/.ssh/config= alias); a
+  prerequisite of Stage 2, which only checks it.
+- Stage 4 =pltfrmDevelUnBecome=: a fast switch to anon mode and (its unMaterialize) back to devel.
+
+* Architecture
+
+A CBM leaf is a =cbmProc.spcs= pointer (=capabilityName= + =cbsSpec=) to a CBS in this package, gated by
+=cbmProc.control= and logged in =cbmProc.status= (see =bisos-pip/capability=). The CBSs, sboms and
+assemble steps of the capabilities above are to live here. Entry points: none real yet.
+
+* What Works
+
+Nothing in this package yet. The steps its CBMs must reproduce were done by hand on 2026-11-04 in
+=bisos-pip/capability= (and work): the repos under =/bisos/git/auth/bxRepos=
+(=bx-gitReposBases ... --vcMode=auth=, =bxRepos-gitist.pcs -i csCmndEval all=) and 59 of the 63
+=bisos-pip/*/py3= packages editable in =dev-bisos3=
+(=pypiProc.sh -i pkgReInstall edit /bisos/venv/py3/dev-bisos3=, in a loop of our own).
+
+* What Is Untested
+
+Everything in the plan: no CBS, leaf or sbom exists. Validation needs a rawBisos VM.
+
+* Key Design Decisions
+
+- =pltfrmDevelCreds= is a separate CBM; =pltfrmDevelBecome= only checks the credentials, it never writes
+  =~/.ssh/config=. (User, 2026-11-04.)
+- =pltfrmDevelUnBecome= is a separate CBM from =pltfrmDevelBecome=, not its =cbm_unMaterialize=:
+  Become is the slow, idempotent build; UnBecome is a fast switch that destroys nothing (=dev-bisos3=, =devbin= and
+  the =auth= clones stay), and its unMaterialize switches back to devel. Recorded in WorkPlan Stage 4;
+  =<<4.1>>= is still TODO for the user to close. Open: how the mode reaches =PATH= (=<<4.2>>=).
+- Do not use the =ftoProc.sh= walk of =vis_venvPy3Dev_pipInstalls= to install packages:
+  =bisos-pip/ftoProc.sh= lists only =profile=. Loop over =*/py3/pypiProc.sh=. Do not trust =pkgReInstall= or the CBM walker exit
+  codes; the CBS must verify (=pip list -e=, import). Details in the AI-Outputs ledger.
+- Out-of-chain record (pointer): the 2026-11-04 findings behind these decisions are four entries in
+  =blee-binders/evolution/aiActivity-outputs/_nodeBase_/AI-Outputs.org= (under version control,
+  uncommitted when written; actionable when =lcnt=, =pycs=, =qmailSvc=, =gnome= and
+  =bisos-pip/ftoProc.sh= are fixed).
+  The evidence for the failing packages and the =fullyMaterialize= run is in
+  =bisos-pip/capability/AI-WorkPlan.org= Stage 4.
+
+# Local Variables:
+# eval: (setq-local toc-org-max-depth 4)
+# End:

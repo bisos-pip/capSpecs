@@ -1,0 +1,355 @@
+#+title: Work Plan
+#+DATE: <2026-06-10 Wed 13:54>
+#+AUTHOR: Mohsen BANAN
+#+OPTIONS: toc:4
+#+TAGS: me ai aiAndMe
+
+# Provenance (installed once by aiActivity.cs --- not regenerated):
+#   Date:      2026-11-04T15:58:24+00:00
+#   User:      bystar
+#   Templates: /bisos/apps/defaults/ai-templates
+#   Command:   /bisos/venv/py3/devbin/aiActivity.cs -i initiate --activity=bisos-pip
+
+####+BEGIN: b:ai:workflow/driver
+*  [[elisp:(revert-buffer)][revert-buffer]] | [[elisp:(toggle-read-only)][read/wr]] | [[elisp:(show-all)][Show-All]]  [[elisp:(org-shifttab)][Overview]]  [[elisp:(progn (org-shifttab) (org-content))][Content]] | [[elisp:(delete-other-windows)][(1)]] | [[elisp:(progn (save-buffer) (kill-buffer))][S&Q]] [[elisp:(save-buffer)][Save]] [[elisp:(kill-buffer)][Quit]] [[elisp:(bury-buffer)][Bury]] [[elisp:(magit)][Magit]]
+*  [[elisp:(org-cycle)][AI Workflow Driver :: /bx- commands]]    *After |S|: submitted*
+  newStart :: [[elisp:(blee:bnsm:panel-goto "/bisos/panels/bisos-core/bisos-pip/bisos.aiActivity/newStart/_nodeBase_")][Panel]] | [[bashRun:vscodeClaude-assemble.cs -i fullCheck][setup-check]] | [[bashRun:vscodeClaude-assemble.cs -i fullUpdate][setup]] | [[elisp:(b:vscode/init)][partner-init]] | [[elisp:(b:vscode/partnerShow)][partner-show]] | [[aiActivity:session-start][session-start]]
+  VS Code  :: [[elisp:(b:vscode/fileOpen)][Visit]] | [[elisp:(b:vscode/rootOpen)][root-window]] | [[elisp:(b:vscode:claude/dispatch)][Transient]]
+  Session  :: [[elisp:(b:vscode:claude/sessionSelect)][select-session]] | [[aiActivity:session-start][session-start]] | [[aiActivity:session-report][session-report]]  *|S|*  [[aiActivity:S=session-start][session-start]]
+  Activity :: [[aiActivity:activity-reach][activity-reach]] | [[aiActivity:activity-report][activity-report]]  *|S|*  [[aiActivity:S=activity-reach][activity-reach]]
+  Read     :: [[aiActivity:status-read][status-read]] | [[aiActivity:archive-read][archive-read]] | [[aiActivity:ai-outputs][ai-outputs]]  *|S|*  [[aiActivity:S=status-read][status-read]] | [[aiActivity:S=archive-read][archive-read]] | [[aiActivity:S=ai-outputs][ai-outputs]]
+  Work     :: [[aiActivity:todo-do][todo-do]] | [[aiActivity:todo-done][todo-done]]  *|S|*  [[aiActivity:S=todo-do][todo-do]] | [[aiActivity:S=todo-done][todo-done]]
+  Record   :: [[aiActivity:status-update][status-update]] | [[aiActivity:archive-update][archive-update]]  *|S|*  [[aiActivity:S=status-update][status-update]] | [[aiActivity:S=archive-update][archive-update]]
+  Git      :: [[aiActivity:git-commit-msg][git-commit-msg]] | [[aiActivity:git-commit-walk][git-commit-walk]]  *|S|*  [[aiActivity:S=git-commit-msg][git-commit-msg]]
+  Close    :: [[aiActivity:git-uncommitted-list][git-uncommitted-list]] | [[aiActivity:session-verify][session-verify]]  *|S|*  [[aiActivity:S=git-uncommitted-list][git-uncommitted-list]] | [[aiActivity:S=session-verify][session-verify]]
+
+####+END:
+
+####+BEGIN: b:ai:file/particulars
+* AI Working Context
+  Working Directory: /bisos/git/auth/bxRepos/bisos-pip/capSpecs
+  File: /bisos/git/auth/bxRepos/bisos-pip/capSpecs/AI-WorkPlan.org
+  Activity: bisos-pip
+  Companion Docs: AI-WORKFLOW.org, AI-Activity.org, AI-DevStatus.org, README.org
+####+END:
+
+This Work Plan file drives the AI collaborative development.
+Interactions are broken down into "Stages". Each Stage has a set
+of TODOs that I work with Claude to accomplish.
+
+Note to a fresh Claude: read this file together with AI-WORKFLOW.org,
+AI-Activity.org and AI-DevStatus.org to orient yourself. The =<<Context Confirmation>>=
+TODO below is the standard first step, or use =/bx-session-start= as the automated equivalent.
+TODOs tagged =:ai:= are assigned to Claude. After completing a TODO, summarize results
+under =----- Results: ------= and mark it DONE.
+
+
+* Overview, Purpose and Context
+
+<<Overview>>
+
+=bisos.capSpecs= adds CBM (Capability Bundle Materialization) facilities for capabilities that are
+not implemented in a package of their own but that reside in BISOS. The CBM machinery (=cbmProc.spcs=
+leaves, the =cbmProc.control= gate, the =cbm_*= verbs, =sysCbmManage.cs=) is in =bisos.capability=;
+this package supplies the CBSs, sboms and assemble steps that a CBM leaf points at.
+CBM sits on top of CBS: a leaf holds only a pointer (=capabilityName= + =cbsSpec=).
+
+The capabilities of Stages 2 and 3 are of capabilityType =induct=, in realm =collective=: their leaves
+go under =sys/cbm/collective/induct/<capabilityName>/= (in =bro_rawBisos/bro_rawBisosPlatform=).
+
+This activity is foreign-and-lateral to the session that started it (rooted in
+=bisos-pip/capability=, where =sysCbmManage.cs= and the CBM machinery were worked on). Findings
+about other packages go to AI-Outputs.org; the evidence for this package's stages is in
+=bisos-pip/capability/AI-WorkPlan.org= Stage 4 and in AI-Outputs.org (2026-11-04 entries).
+
+
+* Stage 0: Confirm AI's Understanding of This Repo's Context
+
+Goal: Confirm AI's understanding of the context and capture that in [[Context Confirmation]] TODO.
+
+
+* Stage 0 TODOs
+** +
+** LOOP [#A] <<Context Confirmation>> for AI (typically triggered by /bx-session-start) :aiAndMe:
+SCHEDULED: <2026-06-09 Tue>
+Must be repeated each time a new Claude instance is started here.
+Based on the series of files starting from CLAUDE.md in this repo,
+describe succinctly what you have understood.
+Enumerate explicitly which files you have imported and which you have considered.
+Prompt the user to confirm that the desired/appropriate model (/model) is being used for this project.
+Since this is to be repeated, leave the todo tag as LOOP.
+** -
+
+* Stage 1: Misc Place Holder 
+
+<<Stage 1>>
+
+Goal: A placeholder for misc ideas and TODOs
+
+
+* Stage 1 TODOs (Misc)
+** +
+** TODO [#C] A Placeholder
+** -
+
+
+* Stage 2: CapSpecs for pltfrmDevelBecome
+
+<<Stage 2>>
+
+Goal: Create the CBM =pltfrmDevelBecome= (leaf =sys/cbm/collective/induct/pltfrmDevelBecome/=, its CBS
+and sboms in this package) that, after a rawBisos install, converts the platform into a developer
+platform: git from =anon= to =auth=, and pip from PyPI to local (editable) installs.
+
+Precondition, not part of this CBM: =~/.ssh/config= holds the ssh Host alias for the git server (such
+as =mb2_github=). That is Stage 3 (=pltfrmDevelCreds=). This CBM only /checks/ the precondition.
+
+Replaces =/bisos/core/bsip/bin/pltfrmDevelBecome.sh=, which predates sboms and gitist. Everything below
+was done by hand on 2026-11-04 (see =bisos-pip/capability/AI-WorkPlan.org= Stage 4 and the 2026-11-04
+entries of AI-Outputs.org) and has to become idempotent and self-verifying.
+
+What the CBM has to do, in order:
+1. Check the precondition: the alias resolves and authenticates (=ssh -T git@<alias>=); stop with a clear
+   message if not.
+2. Git, anon to auth:
+   - the =bxReposRoot= base: =bx-gitReposBases -v 20 --baseDir="/bisos/git/auth/bxRepos"
+     --pbdName="bxReposRoot" --vcMode="auth" --gitLabel="<alias>" -i pbdUpdate all=;
+   - the repos outside =bisos.common='s registry: =gitLabel=<alias> bxRepos-gitist.pcs -i csCmndEval all=
+     (it skips existing clones);
+   - the =/bisos/git/bxRepos= symlink pointing to =/bisos/git/auth/bxRepos=.
+3. Pip, PyPI to local:
+   - the =dev-bisos3= venv: =bisosPyVenvSetup.sh -i pyVenv_DevSetup= (creates it);
+   - every =bisos-pip/*/py3/pypiProc.sh= installed editable:
+     =pypiProc.sh -i pkgReInstall edit /bisos/venv/py3/dev-bisos3=, as a loop of our own, because the
+     =ftoProc.sh= walk of =vis_venvPy3Dev_pipInstalls= visits nothing (nodesList is only =profile=);
+   - the pip packages of =rawBisos-sbom.pcs= present, locally if a clone exists, else from PyPI.
+4. Verify, and report real failure: =pkgReInstall= exits 0 on failure, and the walker reports =failed=0=
+   (g_csMain), so the CBS checks each package itself (=pip list -e=, import, per-package log).
+
+Known problems to handle (from the 2026-11-04 run): =lcnt=, =pycs=, =qmailSvc= and =gnome= do not
+install (generated =setup.py= / requirements wrong, or pygobject needs =mesonpy=); =vis_sitePkgsBaseGet=
+knows only Python 3.9 and 3.11 (host is 3.13); a clone may exist only under =anon=; running
+=pkgReInstall= dirties every repo (=py3/README.rst=, =py3/_description.org=).
+
+
+* Stage 2 TODOs  -- In Progress
+** +
+** TODO [#A] <<2.1>> Create the needed additional TODOs based on what we have done in this system
+SCHEDULED: <2026-06-09 Tue>
+:PROPERTIES:
+:ORIGIN: Mohsen
+:IMPORTANCE: Medium
+:REPO: this
+:BASE: this
+:FOUND: <2026-10-01 Thu 10:32>
+:END:
+----- Results: ------
+Stage 2 goals and TODOs 2.2 to 2.10 below, and Stage 3 (pltfrmDevelCreds, a placeholder), were written
+from the 2026-11-04 hand-run in =bisos-pip/capability=. Nothing is implemented yet.
+Not marked DONE: review first.
+** TODO [#A] <<2.2>> Settle the leaf and CBS layout
+:PROPERTIES:
+:REPO: this
+:END:
+Where the CBS lives and what it is named (=pltfrmDevelBecome-cbs.pcs=, replacing =null-cbs-induct.cs=);
+sbom split per the =cbm-authorship= skill (service/usage/bundle); the leaf
+=sys/cbm/collective/induct/pltfrmDevelBecome/= (=cbmProc.spcs= pointer, =cbmProc.control= starting at
+=available=); whether =induct/= gets an =ftoBranchProc.spcs= so that the =collective/= walk visits it
+(it has none today, and only =vscodeClaude= is a real CBM there).
+----- Results: ------
+** TODO [#A] <<2.3>> Precondition check: the git alias
+:PROPERTIES:
+:REPO: this
+:END:
+A step that checks the ssh Host alias from Stage 3 (name taken from a parameter, default =mb2_github=)
+and stops with a clear message when it does not authenticate. It never writes =~/.ssh/config=.
+----- Results: ------
+** TODO [#A] <<2.4>> Git step: anon to auth
+:PROPERTIES:
+:REPO: this
+:END:
+=bx-gitReposBases ... --vcMode=auth --gitLabel=<alias> -i pbdUpdate all=, then
+=bxRepos-gitist.pcs -i csCmndEval all=, then the =/bisos/git/bxRepos= symlink. Idempotent. Decide whether
+the symlink switch is its own step (it changes what every later path means). Keep the =# done= markers
+of =bxRepos-gitist.pcs= in mind: they are stale (=bisos/bsip4=, not this repo).
+----- Results: ------
+** TODO [#A] <<2.5>> Pip step: dev-bisos3 venv and editable installs
+:PROPERTIES:
+:REPO: this
+:END:
+Create =dev-bisos3= (=bisosPyVenvSetup.sh -i pyVenv_DevSetup=), then a loop over
+=bisos-pip/*/py3/pypiProc.sh= with =pkgReInstall edit=. Do not use the =ftoProc.sh= walk (nodesList is
+only =profile=). One log per package; a package counts as installed only if =pip list -e= shows it.
+Order: =b= first. Consider a pinned list instead of a glob.
+----- Results: ------
+** TODO [#A] <<2.6>> The packages of rawBisos-sbom.pcs
+:PROPERTIES:
+:REPO: this
+:END:
+Make =rawBisos-sbom.pcs='s pip packages present in =dev-bisos3=: local when a clone exists (the ten that
+=bxRepos-gitist.pcs= adds: gitist, vscodeClaude, devpi, geneweb, gitlab, grafana, kafka, postgres,
+prometheus, pypiserver), PyPI otherwise. Decide whether this is a step of this CBS or a use of that sbom.
+----- Results: ------
+** TODO [#A] <<2.7>> Verify, and report real failure
+:PROPERTIES:
+:REPO: this
+:END:
+=pkgReInstall= exits 0 on failure and the walker reports =failed=0= (g_csMain limitation, not to be
+worked around in =bisos.b=): the CBS must itself check and exit non-zero. Checks: =from bisos import b=
+in =dev-bisos3=, =rawBisos-sbom.pcs= runs, every package that must be editable is, a summary table.
+----- Results: ------
+** TODO [#B] <<2.8>> Known failures: lcnt, pycs, qmailSvc, gnome
+:PROPERTIES:
+:REPO: lcnt, pycs, qmailSvc, gnome (and the pypiProc.sh machinery)
+:END:
+These four do not install editable (details in AI-Outputs.org, 2026-11-04). Fixes belong in those repos
+(regenerate =setup.py= / requirements with =pypiProc.sh=; mesonpy and apt dev libs for gnome). Until
+then the CBS must skip them explicitly and say so, not fail the whole materialization. =bisos-py3-all=
+needs lcnt and pycs.
+----- Results: ------
+** TODO [#B] <<2.9>> Host Python version and repo hygiene
+:PROPERTIES:
+:REPO: /bisos/core/bsip and this
+:END:
+=vis_sitePkgsBaseGet= knows only Python 3.9 and 3.11 (host is 3.13): the CBS must not depend on it.
+=pkgReInstall= regenerates =py3/README.rst= and =py3/_description.org= in every repo, dirtying them:
+decide whether to run it with those restored, or accept it.
+----- Results: ------
+** TODO [#B] <<2.10>> Plant the leaf, test on a rawBisos VM
+:PROPERTIES:
+:REPO: this and bro_rawBisos/bro_rawBisosPlatform
+:END:
+Plant the leaf under =sys/cbm/collective/induct/pltfrmDevelBecome/=, =cbm_enable=, materialize it
+individually, then through =sysCbmManage.cs -i fullyMaterialize=. Full validation needs a rawBisos VM
+(containers cannot): rawBisos install, add the credentials (Stage 3), materialize.
+----- Results: ------
+** -
+
+
+* Stage 3: CapSpecs for pltfrmDevelCreds (placeholder)
+
+<<Stage 3>>
+
+Goal: Create the CBM =pltfrmDevelCreds= (leaf =sys/cbm/collective/induct/pltfrmDevelCreds/=) that
+prepares the credentials the developer platform needs, so that =pltfrmDevelBecome= (Stage 2) finds its
+precondition met. Separate from =pltfrmDevelBecome=, and a prerequisite of it.
+
+Placeholder: nothing is decided yet beyond the following.
+- Today the precondition is a hand-added Host alias in =~/.ssh/config= (=mb2_github=); the ssh identity
+  and the account it stands for are the user's, and credentials must never be committed or logged.
+- Open: what the CBM does and what it only checks (writing =~/.ssh/config=, key generation, an agent,
+  =~/credentials/githubHosts.cfg= as read by =bxRepos-gitist.pcs=), and how an alias name is chosen.
+- Open: whether it can be materialized unattended (a key needs a human or a secret store).
+
+* Stage 3 TODOs
+** +
+** TODO [#B] <<3.1>> Decide the scope of pltfrmDevelCreds
+:PROPERTIES:
+:REPO: this
+:END:
+What it creates versus what it checks; how the alias and key reach it (parameters, not repo files);
+the interface with Stage 2's step 1 (=<<2.3>>=).
+----- Results: ------
+** TODO [#C] <<3.2>> Specify, implement and test pltfrmDevelCreds
+:PROPERTIES:
+:REPO: this
+:END:
+After =<<3.1>>=: CBS, leaf under =sys/cbm/collective/induct/pltfrmDevelCreds/=, verification (the alias
+authenticates). Not before Stage 2's layout (=<<2.2>>=) is settled.
+----- Results: ------
+** -
+
+
+* Stage 4: pltfrmDevelUnBecome --- a Fast Switch Between Anon and Devel
+
+<<Stage 4>>
+
+Goal: the CBM =pltfrmDevelUnBecome= (leaf =sys/cbm/collective/induct/pltfrmDevelUnBecome/=) switches a
+developer platform back to anon mode, /quickly/, and its own =cbm_unMaterialize= switches back to devel,
+just as quickly. Nothing is installed or removed by either: only the mode changes. Needs no credentials.
+
+The decision (2026-11-04, user): =pltfrmDevelUnBecome= is a separate CBM, and it is not the
+=cbm_unMaterialize= of =pltfrmDevelBecome=. The two CBMs have different jobs:
+
+| CBM                 | Job                      | Cost                 | Its unMaterialize       |
+|---------------------+--------------------------+----------------------+-------------------------|
+| pltfrmDevelBecome   | build the devel platform | slow: clones, pip -e | not the way to go anon  |
+| pltfrmDevelUnBecome | switch to anon mode      | fast: switch only    | switch back to devel    |
+
+Devel mode is two things (to be pinned in =<<4.2>>=): the =/bisos/git/bxRepos= symlink pointing to
+=/bisos/git/auth/bxRepos=, and the =dev-bisos3= venv with the =devbin= scripts being /in use/. Anon mode
+is the symlink pointing to =/bisos/git/anon/bxRepos= and the regular =/bisos/venv/py3/bisos3= in use.
+=dev-bisos3=, =devbin= and the =auth= clones all stay on disk in both modes.
+
+Assessment of the approach (Claude, for review):
+- Good: it makes the mode a toggle, both directions are cheap and repeatable, and the build
+  (=pltfrmDevelBecome=, slow, idempotent) is run once. A toggle is also safe: it destroys nothing, so
+  uncommitted work in the =auth= clones and the editable installs are never at risk.
+- The two edges: (1) =pltfrmDevelBecome= stays the only place that installs; the switch back must not
+  silently assume the devel platform is still complete. A cheap drift check on switching to devel is
+  needed (are the =auth= clones all there, is every package still editable, did =anon= gain repos).
+  (2) Anon and =auth= clones drift apart: =anon= can be weeks behind, so anon mode is not "the same code
+  without write access".
+- What "in use" means has to be made explicit. Today =/bisos/venv/py3/devbin= and
+  =/bisos/venv/py3/dev-bisos3/bin= come /before/ =/bisos/venv/py3/bisos3/bin= on =PATH= (positions 9, 10
+  and 11 in an interactive shell on 2026-11-04), so devel mode is "in use" just because those directories
+  exist. Removing them is what the first design did; renaming them is not safe (a venv has absolute
+  paths: shebangs, =activate=). So the switch has to act on =PATH= (where it is built, and for
+  non-interactive users such as CBM subprocesses, sudo and systemd, whose =PATH= is not the shell's).
+  The editable installs themselves point at =/bisos/git/auth/...= directly, not through the symlink, so
+  flipping the symlink does not break =dev-bisos3=.
+- The switch must verify itself: =readlink /bisos/git/bxRepos=, =which aiActivity.cs=, and that
+  =from bisos import b= resolves where the mode says it should. =g_csMain= and =pkgReInstall= report
+  success on failure, so the CBS checks, it does not trust exit codes.
+
+What it must not do (to be confirmed):
+- Delete the =auth= clones, =dev-bisos3= or =devbin=: they hold the devel platform and may hold
+  uncommitted work.
+- Touch =~/.ssh/config= (Stage 3's, the user's).
+- Switch while =sysCbmManage.cs= or a materialization is running (the mode changes which code they run).
+
+* Stage 4 TODOs
+** +
+** TODO [#B] <<4.1>> Decide: separate CBM or unMaterialize of pltfrmDevelBecome, and the name
+:PROPERTIES:
+:REPO: this
+:END:
+Decided by the user, 2026-11-04: separate CBM, named =pltfrmDevelUnBecome=; a fast switch, whose own
+unMaterialize switches back to devel (see the Stage 4 Goal).
+----- Results: ------
+Decision recorded in the Goal. =README.org= still lists the two capabilities of Stages 2 and 3 only:
+add =pltfrmDevelUnBecome= there when it is specified (=<<4.2>>=).
+** TODO [#A] <<4.2>> Pin down what the mode is, and how it is switched
+:PROPERTIES:
+:REPO: this and where PATH is built (/bisos/core/bsip or the bashrc of bisos/defaults)
+:END:
+Define devel mode and anon mode precisely: the =/bisos/git/bxRepos= symlink, and which of =devbin=,
+=dev-bisos3/bin= and =bisos3/bin= are on =PATH=. Find where =PATH= is built, how a non-interactive
+caller (CBM subprocess, sudo, systemd unit) gets it, and the least invasive switch (a mode marker read
+by the =PATH= builder; not renaming a venv). Answer first: do the CBMs run under =dev-bisos3= or
+=bisos3= today, and should they differ per mode?
+----- Results: ------
+** TODO [#A] <<4.3>> Specify the two directions and the drift check
+:PROPERTIES:
+:REPO: this
+:END:
+UnBecome (to anon): require the =anon= clones (the ten repos that =bxRepos-gitist.pcs= adds exist there
+only if it was run in anon mode), repoint the symlink, switch =PATH=, verify. Its unMaterialize (to
+devel): drift check first (all =auth= clones present, every package of =<<2.5>>= editable, new =anon=
+repos reported), then repoint, switch =PATH=, verify. If the check finds drift, say to run
+=pltfrmDevelBecome=, do not install. Both: idempotent, and refuse while a materialization runs.
+----- Results: ------
+** TODO [#C] <<4.4>> Implement and test, with Stage 2 on a rawBisos VM
+:PROPERTIES:
+:REPO: this
+:END:
+Round trip: become, un-become, un-materialize (back to devel), un-become again: no residue, no install.
+Time the switch (it is meant to be fast).
+----- Results: ------
+** -
+
+
+# Local Variables:
+# eval: (setq-local toc-org-max-depth 4)
+# eval: (setq-local org-log-done 'time)
+# End:

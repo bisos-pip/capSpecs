@@ -45,6 +45,8 @@ packages are installed from their local repos. That is =pltfrmDevelBecome=, toda
   - [[#pltfrmdevelcreds][pltfrmDevelCreds]]
   - [[#pltfrmdevelbecome][pltfrmDevelBecome]]
   - [[#pltfrmdevelunbecome][pltfrmDevelUnBecome]]
+  - [[#emacssrcbuild-emacs31srcbuild][emacsSrcBuild (emacs31SrcBuild)]]
+  - [[#bleebuild-blee31build][bleeBuild (blee31Build)]]
 - [[#how-a-capspecs-capability-is-materialized][How a capSpecs Capability Is Materialized]]
 - [[#installation][Installation]]
 - [[#key-files][Key Files]]
@@ -143,6 +145,59 @@ stay. UnBecome switches to anon mode (the =/bisos/git/bxRepos= symlink back to =
 platform is still complete. It is not the unMaterialize of pltfrmDevelBecome, which is the slow build.
 /Planned: how the mode reaches PATH is still open./
 
+** emacsSrcBuild (emacs31SrcBuild)
+
+Builds Emacs from source and makes it the default =emacs=. The leaf is generic,
+=sys/cbm/collective/induct/emacsSrcBuild/=; the version is chosen by the symlink
+=emacsSrcBuild-cbs.pcs=, which today points to =emacs31SrcBuild-cbs.pcs=: the release tag =emacs-31.1=.
+Moving to another version is a new =emacsNNSrcBuild-*= set and a repointed symlink.
+
+The build is that of =/bisos/blee/bin/lcaEmacsSrcBinsPrep.sh= (tree-sitter, AOT native compilation,
+gtk3), used as it is, one step at a time. The result is in =/usr/local/bin= (=emacs-31=,
+=emacsclient-31=), and =/usr/local/bin/emacs= points to it, ahead of Debian's =/bin/emacs=, which stays.
+The same on a container, a VM and a box. Precondition, only checked: =deb-src= in the apt sources
+(=apt-get build-dep emacs= needs it); enabling it belongs to the rawBisos install.
+
+#+begin_src bash
+emacs31SrcBuild-assemble.cs -i fullCheck          # read-only: one summary table
+emacs31SrcBuild-assemble.cs -i fullUpdate         # the steps unless 31.1 is installed; then fullCheck
+emacs31SrcBuild-assemble.cs -i fullUpdate force   # rebuild and reinstall
+emacs31SrcBuild-assemble.cs -i stepRun srcBuild   # one step, to resume after a failure
+#+end_src
+
+The steps are =srcEnvSetup=, =srcPkgObtain= (skipped when the sources are there), =srcBuild=,
+=srcBinInstall=, =postInstall= and =setAsDefault=, with one log each in =/tmp/emacs31SrcBuild/=.
+=fullCheck= requires =deb-src=, the sources, =emacs-31= and =emacsclient-31= reporting 31.1, native
+compilation and tree-sitter available, =/usr/local/bin/emacs= leading to =emacs-31.1=, and
+=/usr/local/bin/emacsclient= absent or an emacsclient. The verdict is the text
+=emacs31SrcBuild: complete= or =NOT complete=. If the clone fails, =fullUpdate= stops; run it again.
+Materialized on a container (2026-11-12, about 10 minutes on 96 cores); not yet on a VM or a box.
+
+** bleeBuild (blee31Build)
+
+Builds Blee (the =doom-blee3= profile) for Emacs 31, =/usr/local/bin/emacs-31= (installed by
+=emacsSrcBuild=), whether or not it is the default Emacs. As with =emacsSrcBuild=, the files are
+version-specific (=blee31Build-*=) and the leaf =sys/cbm/collective/induct/bleeBuild/= is generic: it
+points to the symlink =bleeBuild-cbs.pcs=, which today points to =blee31Build-cbs.pcs=. The doom commit
+is the one pinned for Emacs 31 in =/bisos/blee/bin/bleeLib.sh=. The build is that of
+=/bisos/blee/bin/bleeDoomsManage.sh=, used as it is: =doomFrameworkPrep= (the doomemacs clone for Emacs
+31, at its pin), then =buildInstall= (=doom install= into
+=/bisos/blee/emacsVers/<version>/doom-run-blee3=; network). Precondition, only checked: =emacs-31= is a =/usr/local= build.
+
+It only builds. Each user's chemacs2 =~/.emacs-profiles.el= is not changed, so a running Blee keeps its
+Emacs; switch with =blee -p emacs=31 -i run doom-blee3=.
+
+#+begin_src bash
+blee31Build-assemble.cs -i fullCheck                    # read-only: one summary table
+blee31Build-assemble.cs -i fullUpdate                   # framework, build unless built, then fullCheck
+blee31Build-assemble.cs -i fullUpdate force             # reBuild: delete the run base, build again
+blee31Build-assemble.cs -i stepRun doomFrameworkPrep    # one step, to resume after a failure
+#+end_src
+
+=fullCheck= requires =emacs-31= to be a =/usr/local= build, the framework at its pin, the run base built
+for that Emacs, =bin/doom version= reporting that Emacs and the pin, =config.el= being the with-Blee one,
+and the blee repo's config files unchanged.
+
 * How a capSpecs Capability Is Materialized
 
 The layering is that of bisos.capability: a CBM sits on top of a CBS; it does not duplicate it.
@@ -184,6 +239,12 @@ cd py3 && ./pypiProc.sh -i pkgReInstall edit /bisos/venv/py3/dev-bisos3
   (=-cbs.pcs=, =-sbom.pcs= and =cbmProc-pltfrmDevelBecome.spcs= are beside it).
 - [[file:./py3/bisos/capSpecs/pltfrmDevelBecomeInfo.py]] --- its pure facts: alias, repo roots, venv,
   the known failures, and the checks.
+- [[file:./py3/bin/emacs31SrcBuild-assemble.cs]] --- the steps and the check of the Emacs 31 build
+  (=-cbs.pcs=, =-sbom.pcs=, the symlink =emacsSrcBuild-cbs.pcs= and =cbmProc-emacsSrcBuild.spcs= are
+  beside it); its facts are in [[file:./py3/bisos/capSpecs/emacs31SrcBuildInfo.py]].
+- [[file:./py3/bin/blee31Build-assemble.cs]] --- the steps and the check of the Blee build for Emacs 31
+  (=-cbs.pcs=, =-sbom.pcs=, the symlink =bleeBuild-cbs.pcs= and =cbmProc-bleeBuild.spcs= are beside it);
+  its facts are in [[file:./py3/bisos/capSpecs/blee31BuildInfo.py]].
 - [[file:./py3/bin/null-cbs-induct.cs]] --- the placeholder CBS for an induct capability, to be
   replaced by one per capability.
 - [[file:./py3/bin/null-assemble.cs]] --- the placeholder assemble step.

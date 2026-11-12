@@ -52,6 +52,25 @@ registry repo =bisos-pip/bootstrap/dev/bisos/bootstrap-vagrants= is not cloned i
 read-only and with stubs; =gitAnonToAuth=, the install paths and =fullUpdate= are unrun. The =null-*=
 scaffold is still there; =py3/setup.py= is not regenerated (the new scripts are not in its scripts list).
 
+2026-11-12, later: =emacsSrcBuild= (WorkPlan Stage 5, 5.1 and 5.2): Emacs 31 from the tag =emacs-31.1=,
+built by =/bisos/blee/bin/lcaEmacsSrcBinsPrep.sh= (unedited), made the default =/usr/local/bin/emacs=.
+Files =emacs31SrcBuild-{cbs.pcs,sbom.pcs,assemble.cs}=, =emacs31SrcBuildInfo.py=, the generic symlink
+=emacsSrcBuild-cbs.pcs=, =cbmProc-emacsSrcBuild.spcs=; leaf =collective/induct/emacsSrcBuild/=, now
+=enabled=. Materialized on this host through the leaf: complete. The capSpecs scripts are linked into
+=/bisos/venv/py3/devbin= (=pypiProc.sh -i devBinSymlinks=).
+
+2026-11-12, later: =bleeBuild= (WorkPlan Stage 6, 6.1 to 6.3): Blee (=doom-blee3=) built for Emacs 31
+(=/usr/local/bin/emacs-31=) by =/bisos/blee/bin/bleeDoomsManage.sh= (unedited), with the doom pin of
+=bleeLib.sh=. Version-specific since 6.3, as =emacsSrcBuild=: files
+=blee31Build-{cbs.pcs,sbom.pcs,assemble.cs}=, =blee31BuildInfo.py=, the generic symlink =bleeBuild-cbs.pcs=, =cbmProc-bleeBuild.spcs=; leaf
+=collective/induct/bleeBuild/=, =enabled=. Materialized on this host: complete (doom =01d68aaf6= on Emacs
+31.1); the user ran =doom-blee3= on 31 and it came up. It only builds: the user's =~/.emacs-profiles.el=
+is the user's (=blee -p emacs=31 -i run=).
+
+Open from Stages 5 and 6 (WorkPlan Stage 1, =:aiAndMe:=): =<<1.1>>= record in =bleeLib.sh= (blee repo)
+that the 31 doom pin is proven on 31.1; =<<1.2>>= make =/usr/local/bin/emacsclient= the Emacs 31 one
+(absent today, so =emacsclient= on =PATH= is Debian's 30.1).
+
 * Architecture
 
 A CBM leaf is a =cbmProc.spcs= pointer (=capabilityName= + =cbsSpec=) to a CBS in this package, gated by
@@ -60,15 +79,20 @@ assemble steps of the capabilities above are to live here. Entry points: none re
 
 * What Works
 
-Nothing in this package yet. The steps its CBMs must reproduce were done by hand on 2026-11-04 in
-=bisos-pip/capability= (and work): the repos under =/bisos/git/auth/bxRepos=
-(=bx-gitReposBases ... --vcMode=auth=, =bxRepos-gitist.pcs -i csCmndEval all=) and 59 of the 63
-=bisos-pip/*/py3= packages editable in =dev-bisos3=
-(=pypiProc.sh -i pkgReInstall edit /bisos/venv/py3/dev-bisos3=, in a loop of our own).
+- =emacsSrcBuild=: materialized on this host (a container) through its leaf: build, install, default,
+  =fullCheck= complete (8 rows); a second materialize changes nothing. Stub tests of the sequencing.
+- =bleeBuild=: materialized on this host through its leaf, =fullCheck= complete (6 rows); a second
+  materialize skips the build. Stub tests of the sequencing and of each failing row.
+- =pltfrmDevelBecome=: the read-only checks on this host (=fullCheck= red on one row:
+  =bootstrap-vagrants= is not cloned in auth); the install and switch paths with stubs only.
 
 * What Is Untested
 
-Everything in the plan: no CBS, leaf or sbom exists. Validation needs a rawBisos VM.
+- =pltfrmDevelBecome=: =gitAnonToAuth=, the install paths and =fullUpdate=; needs a rawBisos VM.
+- =emacsSrcBuild=: on a VM and a box; from =sysCbmManage.cs -i fullyMaterialize= (=induct/= has no
+  =ftoBranchProc.spcs=); the Blee scripts' =emacsclient= defect is only detected, not repaired
+  (=<<1.2>>=).
+- =bleeBuild=: on a VM and a box (on this host the user verified Blee 31 visually).
 
 * Key Design Decisions
 
@@ -78,6 +102,17 @@ Everything in the plan: no CBS, leaf or sbom exists. Validation needs a rawBisos
   Become is the slow, idempotent build; UnBecome is a fast switch that destroys nothing (=dev-bisos3=, =devbin= and
   the =auth= clones stay), and its unMaterialize switches back to devel. Recorded in WorkPlan Stage 4;
   =<<4.1>>= is still TODO for the user to close. Open: how the mode reaches =PATH= (=<<4.2>>=).
+- =emacsSrcBuild= (User, 2026-11-12): the CBS and its files are version-specific (=emacs31SrcBuild-*=),
+  the leaf generic through the symlink =emacsSrcBuild-cbs.pcs=; the tag is pinned; 31 is the default once
+  installed; =deb-src= belongs to the rawBisos install (only checked here); the script's tree-sitter is
+  kept; the same on container, VM and box. Out-of-chain: two ledger entries in
+  =blee-binders/evolution/.../AI-Outputs.org= (=deb-src= on Debian 13; the clone and =emacsclient=
+  defects of the Blee scripts).
+- =bleeBuild= (User, 2026-11-12): version-specific like =emacsSrcBuild= (6.3; it replaced 6.1's "no
+  version in any name"): =blee31Build-*= files, the Emacs major fixed in =blee31BuildInfo=, and the leaf
+  kept generic through the symlink =bleeBuild-cbs.pcs=. The script's doom pin. It only builds; the
+  switch of =~/.emacs-profiles.el= is the user's. The clone under =/bisos/git/anon/ext/emacs= is
+  acceptable (an external upstream, not ours).
 - Do not use the =ftoProc.sh= walk of =vis_venvPy3Dev_pipInstalls= to install packages:
   =bisos-pip/ftoProc.sh= lists only =profile=. Loop over =*/py3/pypiProc.sh=. Do not trust =pkgReInstall= or the CBM walker exit
   codes; the CBS must verify (=pip list -e=, import). Details in the AI-Outputs ledger.

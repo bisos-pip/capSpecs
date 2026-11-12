@@ -1,0 +1,30 @@
+#!/usr/bin/env python
+
+""" #+begin_org
+* Panel::  [[file:./py3/panels/bisos.capSpecs/_nodeBase_/fullUsagePanel-en.org]]
+* Overview and Relevant Pointers
+blee31Build-cbs.pcs   (the CBM leaf bleeBuild reaches it through the symlink bleeBuild-cbs.pcs)
+cbs: Capability Bundle Specification  -- Based on a cba-sysd.cs seed, of type induct (no units)
+i:  Induct      --- /Non-Service Component/ --- Blee (doom-blee3) built for Emacs 31
+n:  No Data    -- Materialization is purely based on Realm-BPO
+p:  Platform    -- Materialization is based on Platform-BPO (Site-BPO is not used)
+
+The bundle: blee31Build-sbom.pcs (no packages: doom fetches its own, about 169, from the network) and
+blee31Build-assemble.cs (the steps of /bisos/blee/bin/bleeDoomsManage.sh; fullCheck is read-only).
+Blee is built for /usr/local/bin/emacs-31 (installed by emacsSrcBuild), default or not, with the doom pin of
+bleeLib.sh. Precondition, only checked: Emacs 31 is a /usr/local build. capSpecs WorkPlan Stage 6.
+#+end_org """
+
+
+from bisos.capability import cba_sysd_seed
+from bisos.capability import cba_seed
+
+cba_seed.setup(
+    seedType="induct",  # not systemd: cbs_materialize runs the sbom and the assemble only
+    loader=None,
+    sbom="blee31Build-sbom.pcs",
+    assemble="blee31Build-assemble.cs",
+    materialize=None,
+)
+
+cba_sysd_seed.plantWithWhich("cba-sysd.cs")

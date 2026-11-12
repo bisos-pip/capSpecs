@@ -90,6 +90,28 @@ Goal: A placeholder for misc ideas and TODOs
 * Stage 1 TODOs (Misc)
 ** +
 ** TODO [#C] A Placeholder
+** TODO [#B] <<1.1>> Update the doom pin entry for Emacs 31 in bleeLib.sh: proven on 31.1 :aiAndMe:
+:PROPERTIES:
+:REPO: bisos/blee (bin/bleeLib.sh)
+:FOUND: <2026-11-12 Thu>
+:END:
+=doomPinForEmacsMajor= says for 31: "testedAgainst: emacs 31.1.50 testedOn: <2026-09-06 Sun>" with doom
+=01d68aaf6=. On 2026-11-12 the same pin built on the 31.1 release (=bleeBuild=, WorkPlan 6.2: =doom
+version= emacs 31.1, doom =01d68aaf6=) and the user ran Blee 31 (=blee -p emacs=31 -i run doom-blee3=):
+it came up. Add that provenance to the entry (testedAgainst 31.1, testedOn 2026-11-12).
+----- Results: ------
+** TODO [#B] <<1.2>> Make /usr/local/bin/emacsclient the Emacs 31 one :aiAndMe:
+:PROPERTIES:
+:REPO: this (emacsSrcBuild), or by hand
+:FOUND: <2026-11-12 Thu>
+:END:
+Deferred by the user in Stage 5. Today =/usr/local/bin/emacsclient= is absent, so =emacsclient= on
+=PATH= is Debian's 30.1, while =/usr/local/bin/emacs= is 31.1 and Blee runs on 31. Link it to
+=emacsclient-31= (=emacs31SrcBuild='s =fullCheck= row =client link= already accepts it). Decide whether
+=emacsSrcBuild= does it (with the default Emacs) or the user does it when switching to Blee 31; the
+script's own way (=setAsDefault='s =bleeclient emacsClientMatchingSet=) links a terminal when not run
+from inside Emacs (AI-Outputs ledger, 2026-11-12).
+----- Results: ------
 ** -
 
 
@@ -501,6 +523,205 @@ repos reported), then repoint, switch =PATH=, verify. If the check finds drift, 
 Round trip: become, un-become, un-materialize (back to devel), un-become again: no residue, no install.
 Time the switch (it is meant to be fast).
 ----- Results: ------
+** -
+
+* Stage 5: CBM for Emacs 31 Src Build 
+
+<<Stage 5>>
+
+Goal: Create needed files so that Emacs 31 can be built and installed on this sys
+Materialize it through  /bisos/platform/sys/cbm/collective/induct/emacsSrcBuild/
+Using /bisos/blee/bin/lcaEmacsSrcBinsPrep.sh
+
+** TODO [#A] <<5.1>> Describe your plan for acomplishing [[Stage 5]]
+SCHEDULED: <2026-11-12 Thu 18:37>
+----- Results: ------
+2026-11-12 (Claude; decisions with the user; not marked DONE):
+- Decisions (user):
+  - The CBS and its files are version-specific: =emacs31SrcBuild-*=. The CBM leaf stays generic
+    (=emacsSrcBuild=) through a chosen symlink.
+  - Pin the release tag =emacs-31.1= (selector =emacs31=, the script's =_git= form; not the =emacs-31=
+    branch, not the =31.1.90= pretest).
+  - When 31 is available it is the default: materializing also points =/usr/local/bin/emacs= at it
+    (=/usr/local/bin= is before =/bin= on =PATH=; Debian's =/bin/emacs= 30.1 stays installed).
+  - =deb-src= is to be enabled earlier, in the rawBisos install; recorded in the AI-Outputs ledger. This
+    CBM checks it and stops with a clear message.
+  - Keep the script's tree-sitter (v0.27.0 from GitHub, into =/usr/local=). Same on Container, VM, Box.
+- Files, in =py3/bin/= (modelled on =pltfrmDevelBecome= and the lcnt CBSs):
+  - =emacs31SrcBuild-cbs.pcs=: =seedType="induct"=, =materialize=None=, plants =cba-sysd.cs=.
+  - =emacs31SrcBuild-sbom.pcs=: no packages. The build dependencies stay in the script, per Debian
+    generation (=apt-get build-dep emacs= plus its lists); a copy here would drift.
+  - =emacs31SrcBuild-assemble.cs=, logic in =py3/bisos/capSpecs/emacs31SrcBuildInfo.py= (pure facts:
+    selector, tag, source and install paths, script path):
+    - =fullCheck=: read-only. Rows: =deb-src= enabled (deb822 or =sources.list=), sources present,
+      =/usr/local/bin/emacs-31= and =emacsclient-31= exist and report 31.1, =native-comp-available-p= and
+      =treesit-available-p= are =t=, =/usr/local/bin/emacs= resolves to 31. Prints =complete= or =NOT
+      complete= and a usage error (=g_csMain= exits 0 on failure).
+    - =fullUpdate=: the script's steps one by one, not =srcFullBuild= (it pauses for Enter before each
+      step): =srcEnvSetup=, =srcPkgObtain= (skipped when the source tree exists: a second =git clone=
+      fails), =srcBuild=, =srcBinInstall=, =postInstall=, =setAsDefault=; one log each in
+      =/tmp/emacs31SrcBuild/=. Skipped when 31.1 is already installed, unless forced (a =--force= style
+      parameter). Stops first if =deb-src= is missing. Ends with =fullCheck=; exit codes not trusted.
+  - The chosen symlink: =py3/bin/emacsSrcBuild-cbs.pcs= -> =emacs31SrcBuild-cbs.pcs=. The leaf's
+    =cbsSpec= names the symlink; moving to 32 is a new =emacs32SrcBuild-*= set and a repointed symlink.
+    =resolveCbsSpec()= keeps the symlink's path (=.absolute()=), so the CBS runs by the generic name.
+  - =cbmProc-emacsSrcBuild.spcs=, copied as =cbmProc.spcs= to the existing leaf
+    =bro_rawBisosPlatform/sys/cbm/collective/induct/emacsSrcBuild/= with =cbmProc.control= =available=.
+- The script is not edited. =setAsDefault= ends with =bleeclient ... emacsClientMatchingSet=, which needs
+  a running Blee; its failure is reported, not fatal (the check looks at =/usr/local/bin/emacs=).
+- Found while planning: =debAptSourcesManage.sh= cannot enable =deb-src= on Debian 13 (it reads only
+  =/etc/apt/sources.list=; Debian 13 uses =debian.sources=); this host has no =deb-src=. Ledger entry
+  =deb-src should be enabled by the rawBisos install= (=blee-binders/evolution=, uncommitted).
+- Test plan (5.2): stubs for the step sequencing and skips; then a real build and install here (a
+  container). Not on a VM or Box.
+- Host change (Claude, with the user's OK, 2026-11-12): =deb-src= enabled on this host by hand ahead of
+  the rawBisos fix: =Types: deb deb-src= in both stanzas of =/etc/apt/sources.list.d/debian.sources=
+  (backup =/etc/apt/debian.sources.20261112190458=, kept outside =sources.list.d= so apt does not read
+  it), then =apt-get update=. =apt-get -s build-dep emacs= now resolves.
+
+** TODO [#A] <<5.2>> Implement [[5.1]]
+SCHEDULED: <2026-11-12 Thu 18:37>
+----- Results: ------
+2026-11-12 (Claude; as planned in 5.1; not marked DONE):
+- Files (=py3/bin/=): =emacs31SrcBuild-cbs.pcs=, =emacs31SrcBuild-sbom.pcs= (no packages),
+  =emacs31SrcBuild-assemble.cs=, the symlink =emacsSrcBuild-cbs.pcs= -> =emacs31SrcBuild-cbs.pcs=,
+  =cbmProc-emacsSrcBuild.spcs=; facts in =py3/bisos/capSpecs/emacs31SrcBuildInfo.py= (test overrides
+  =EMACS_SRC_BUILD_{SCRIPT,BINDIR,SRCDIR,APTDIR,LOGDIR}=).
+  - Cmnds: =fullCheck= (read-only, 8 rows: deb-src, sources, emacs, emacsclient, native-comp,
+    tree-sitter, default, client link), =stepRun <step>= (one step of the script, to resume),
+    =fullUpdate [force]=.
+  - =fullUpdate= stops after =srcPkgObtain= when no sources came (the script reports a failed clone as
+    done).
+- Leaf planted: =bro_rawBisosPlatform/sys/cbm/collective/induct/emacsSrcBuild/= (=cbmProc.spcs=,
+  =.control=, =.status=; untracked). Gate tested at =available= (skip logged), then *enabled* for the
+  real run; it stays =enabled=.
+- =PATH=: the CBS finds its sbom and assemble by basename, and they were not on =PATH=. Ran
+  =pypiProc.sh -i devBinSymlinks= in =py3/=: every =py3/bin= file is now linked into
+  =/bisos/venv/py3/devbin= (as =pkgReInstall= does; also the pltfrmDevelBecome and =null-*= ones).
+- Stub tests (scratchpad stub of the script): no deb-src refuses and runs nothing; fresh runs the six
+  steps in order, complete; again does nothing; default gone runs =setAsDefault= only; =force= rebuilds
+  but skips the clone; a script that installs nothing ends =NOT complete=; bad step and argument
+  refused; a client link to a terminal fails =client link=.
+- Real runs on this host (a container), through the leaf (=cbm_materialize=):
+  1. 19:10: =srcEnvSetup= ok (build-dep emacs); the clone got HTTP 500 from savannah; the script said
+     "cloned"; the build steps failed on the missing tree; tree-sitter 0.27.0 was installed into
+     =/usr/local/lib=; =fullCheck= NOT complete; =cbmProc.status= said "ran: cbs_materialize ok"
+     (=g_csMain=). Clone retried with =stepRun srcPkgObtain=: ok.
+  2. 19:17--19:27 (9.5 min, 96 cores): build, install, =postInstall=, =setAsDefault=. =fullCheck=
+     complete: =/usr/local/bin/emacs-31.1=, =emacs-31=, =emacsclient-31=, native-comp =t=, treesit =t=,
+     =/usr/local/bin/emacs= -> =emacs-31.1=. =emacs --version= on =PATH= is 31.1.
+  3. A third run: build skipped, nothing changed, complete.
+- Found in run 2: =setAsDefault='s =bleeclient emacsClientMatchingSet= took the terminal for the Emacs
+  server and made =/usr/local/bin/emacsclient -> /usr/bin/xfce4-terminal=. Claude removed that link (it
+  did not exist before the run), so =emacsclient= on =PATH= is Debian's 30.1, matching the running Blee
+  (=/bin/emacs=, 30.1); =emacsclient-31= is there. Added the =client link= row so =fullCheck= catches it.
+  Both defects of the Blee scripts are in the AI-Outputs ledger (=REPO: bisos/blee=).
+- Not done: =py3/setup.py= not regenerated (the new scripts are not in its =scripts= list); no Blee
+  panel; not run on a VM or Box; the running Blee was not restarted on 31 (that is Stage 6); which
+  emacsclient =/usr/local/bin/emacsclient= should be is open (=<<1.2>>=).
+
+** -
+
+* Stage 6: CBM for Blee with Emacs 31
+
+<<Stage 6>>
+
+Goal: Create needed files so that Blee (the doom-blee3 profile) can be built on Emacs 31 on this sys
+Materialize it through  /bisos/platform/sys/cbm/collective/induct/bleeBuild
+Using /bisos/blee/bin//bleeDoomsManage.sh
+
+** TODO [#A] <<6.1>> Describe your plan for acomplishing [[Stage 6]]
+SCHEDULED: <2026-11-12 Thu 18:37>
+----- Results: ------
+2026-11-12 (Claude; decisions with the user; not marked DONE):
+- Decisions (user):
+  - Generic, no version in any name: =bleeBuild-*=. The generation is chosen by symlinks: Blee is built
+    for the default Emacs, where =/usr/local/bin/emacs= leads, which =emacsSrcBuild= (and its symlink
+    =emacsSrcBuild-cbs.pcs=) sets. Today that is =emacs-31.1=.
+  - The doom pin is the script's (=doomPinForEmacsMajor= in =bleeLib.sh=; for 31: =01d68aaf6=, proven on
+    31.1.50).
+  - 3(a): the CBM only builds, system-wide under =/bisos/blee=. It does not switch the user's chemacs2
+    =~/.emacs-profiles.el= (it points =doom-blee3= at =emacsVers/30.1=, the running Blee). The user
+    switches with =blee -p emacs=31 -i run doom-blee3=; the =emacsclient-31= link goes with that, later.
+  - The clone under =/bisos/git/anon/ext/emacs/doomemacs-31= is acceptable: an external upstream, not
+    ours.
+  - The user verifies Blee 31 visually; Claude verifies in batch only.
+- What the script does (=-p emacs=<major> -p profile=doom-blee3=): =doomFrameworkPrep= clones doomemacs
+  to
+  =/bisos/git/anon/ext/emacs/doomemacs-<major>=, links =/bisos/blee/dooms/doomemacs-<major>=, resets to
+  the pin; =buildInstall= copies it to =/bisos/blee/emacsVers/<version>/doom-run-blee3= and runs
+  =doom --force install= (network, about 169 packages), rewriting =config.el= of =doom-base-blee3=
+  (tracked in the blee repo) to sans-Blee and back to with-Blee; =reBuild= deletes the run base first.
+- Files (=py3/bin/=): =bleeBuild-cbs.pcs= (induct), =bleeBuild-sbom.pcs= (no packages),
+  =bleeBuild-assemble.cs=, =cbmProc-bleeBuild.spcs= (=cbsSpec= is =bleeBuild-cbs.pcs=, no symlink
+  needed); facts in =py3/bisos/capSpecs/bleeBuildInfo.py=: the default Emacs and its major and version,
+  the pin read from =bleeLib.sh= as text (sourcing it outside its seed does not work), the paths.
+  - =fullCheck= (read-only): the default Emacs is a =/usr/local= build (=emacsSrcBuild= complete); the
+    framework link and its HEAD at the pin; the run base built (=.local/straight/build-<version>=);
+    =bin/doom version= under that Emacs reports its version and the pin; =config.el= is
+    =configWithBlee.el=; the blee repo's =config.el=, =configSansBlee.el=, =configWithBlee.el=,
+    =extras.el= unchanged.
+  - =fullUpdate [force]=: refuses unless the default Emacs is a =/usr/local= build (never builds Emacs);
+    =doomFrameworkPrep=; =buildInstall= unless built (=force=: =reBuild=); then =fullCheck=. =stepRun=.
+- Test plan (6.2): stubs for sequencing and skips; then a real materialize through the leaf on this host.
+
+** TODO [#A] <<6.2>> Implement [[6.1]]
+SCHEDULED: <2026-11-12 Thu 18:37>
+----- Results: ------
+2026-11-12 (Claude; as planned in 6.1; not marked DONE):
+- Files (=py3/bin/=): =bleeBuild-cbs.pcs=, =bleeBuild-sbom.pcs= (no packages), =bleeBuild-assemble.cs=,
+  =cbmProc-bleeBuild.spcs=; facts in =py3/bisos/capSpecs/bleeBuildInfo.py= (test overrides
+  =BLEE_BUILD_{SCRIPT,BINDIR,BLEEBASE,BLEELIB,LOGDIR}=). Linked into =devbin= (=devBinSymlinks=).
+  - Cmnds: =fullCheck= (read-only, 6 rows: emacs, framework, built, doom, config, blee repo),
+    =stepRun <step>= (=doomFrameworkPrep=, =buildInstall=, =reBuild=), =fullUpdate [force]=.
+- Leaf planted: =bro_rawBisosPlatform/sys/cbm/collective/induct/bleeBuild/= (untracked); gate tested at
+  =available=, then *enabled* for the run; it stays =enabled=.
+- Stub tests (scratchpad stub of the script, scratch =/bisos/blee= with git repos): a default Emacs that
+  is not a =/usr/local= build is refused, nothing run; fresh: both steps, complete; again: build skipped;
+  =force=: =reBuild=; a build leaving =config.el= sans-Blee fails =config= and =blee repo=; an edited
+  config file fails =blee repo=; a framework off the pin fails =framework= and =doom=; pin =latest=
+  accepts any HEAD; bad step and argument refused. Fixed from them: a clone without commits was read as
+  HEAD =HEAD=.
+- Real run on this host (a container), through the leaf, 19:57--20:02 (5 min): =doomFrameworkPrep=
+  cloned =/bisos/git/anon/ext/emacs/doomemacs-31= at =01d68aaf6= and linked
+  =/bisos/blee/dooms/doomemacs-31=;
+  =buildInstall= built =/bisos/blee/emacsVers/31.1/doom-run-blee3= ("Doom successfully installed!").
+  =fullCheck= complete: =doom version= reports emacs 31.1 and doom =01d68aaf6=; the blee repo's config
+  files unchanged. A second run: build skipped, complete, 4 s. So the 31 pin (proven on 31.1.50) builds
+  on the 31.1 release.
+- Meanwhile the user ran =blee -p emacs=31 -i run blee3= (pure Blee, not doom): it failed in =calendar=
+  with =user-emacs-directory= nil. Cause: =env3/boot/init.el= sets it from =usgBpos.sh=, and this host
+  has no usage BPO (=~/bpos/usageEnvs/fullUse=); its docstring's =BLEE_HOME= override is not
+  implemented. Not an Emacs 31 issue, and not this CBM's profile. That =blee -i run= also regenerated
+  =~/.emacs-profiles.el= for 31.1 (=default= and =doom-blee3= now -> =emacsVers/31.1=).
+- Verified by the user (2026-11-12): =blee -p emacs=31 -i run doom-blee3= --- "Blee 31 came up."
+- =bleeDoomsManage.sh= left =dooms/doomemacs-31= (a symlink into =/bisos/git/anon/ext/emacs=) untracked
+  in the blee repo, beside the tracked =dooms/doomemacs=; whether to commit it is the user's.
+- Not done: =py3/setup.py= not regenerated; not on a VM or box; =bleeLib.sh='s pin entry still says
+  tested against 31.1.50 (=<<1.1>>=, the blee repo's to update).
+
+** TODO [#A] <<6.3>> Make bleeBuild version-specific, as emacsSrcBuild: blee31Build :aiAndMe:
+SCHEDULED: <2026-11-12 Thu>
+The user (2026-11-12): what was done for =emacs31SrcBuild= and the =emacsSrcBuild= symlink applies to
+=bleeBuild= too. It is =blee31Build=, tied to Emacs 31, and the Emacs version is specified at the
+=-cbs.pcs= level. This supersedes 6.1's "generic, no version in any name".
+----- Results: ------
+2026-11-12 (Claude; not marked DONE):
+- Renamed (all untracked, so plain =mv=): =blee31Build-{cbs.pcs,sbom.pcs,assemble.cs}=,
+  =py3/bisos/capSpecs/blee31BuildInfo.py=. New symlink =bleeBuild-cbs.pcs -> blee31Build-cbs.pcs=. The
+  CBM pointer =cbmProc-bleeBuild.spcs= and the leaf =collective/induct/bleeBuild/= are unchanged except a
+  comment: =cbsSpec= is still =.../bleeBuild-cbs.pcs=, now the symlink.
+- The version: =blee31BuildInfo.majorVersion = "31"=. Blee is built for =/usr/local/bin/emacs-31=
+  (=emacs-31.<minor>=, installed by =emacsSrcBuild=), whether or not =/usr/local/bin/emacs= is the
+  default. Before, it followed =/usr/local/bin/emacs=. The precondition and the =emacs= row of
+  =fullCheck= now check =emacs-31=. The CBS chooses the version by naming =blee31Build-assemble.cs=, as
+  =emacs31SrcBuild-cbs.pcs= does: =cba_seed.setup()= has no parameter to pass a version through.
+- =devbin=: removed the links of the old names; =pypiProc.sh -i devBinSymlinks= linked the new ones.
+- Tested: the stub suite (scratchpad =bleeTest.sh=), same results as in 6.2. Test 1 now: a
+  non-=/usr/local= =emacs-31= is refused even when the default =emacs= is a good build. On this host:
+  =fullCheck= complete (6 rows), and =cbm_materialize= through the leaf: complete, build skipped, 4 s.
+- Docs: README "bleeBuild (blee31Build)" and Key Files; DevStatus.
+
 ** -
 
 

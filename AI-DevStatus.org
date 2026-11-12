@@ -40,6 +40,18 @@ the CBM machinery is in =bisos.capability=. Planned, all of capabilityType =indu
   prerequisite of Stage 2, which only checks it.
 - Stage 4 =pltfrmDevelUnBecome=: a fast switch to anon mode and (its unMaterialize) back to devel.
 
+2026-11-12: =pltfrmDevelBecome= (WorkPlan 2.2 to 2.7) is written, not yet run on a rawBisos VM:
+=pltfrmDevelBecome-{cbs.pcs,sbom.pcs,assemble.cs}=, =cbmProc-pltfrmDevelBecome.spcs=,
+=py3/bisos/capSpecs/pltfrmDevelBecomeInfo.py=, and the leaf (=available=) under
+=bro_rawBisosPlatform/sys/cbm/collective/induct/pltfrmDevelBecome/=. The assemble has the Cmnds
+=gitAliasCheck=, =gitReposCheck=, =gitAnonToAuth=, =gitSymlinkSwitch=, =pipCheck=, =pipVenvEnsure=,
+=pipEditableInstalls=, =rawBisosPipCheck=, =rawBisosPipInstalls=, =fullCheck= (read-only, offline, one
+summary table) and =fullUpdate= (the steps, then =fullCheck=). Verdicts are text (=complete= or =NOT
+complete=): =g_csMain= exits 0 on failure. On this hand-switched host =fullCheck= is red on one row: the
+registry repo =bisos-pip/bootstrap/dev/bisos/bootstrap-vagrants= is not cloned in auth. Tested here only
+read-only and with stubs; =gitAnonToAuth=, the install paths and =fullUpdate= are unrun. The =null-*=
+scaffold is still there; =py3/setup.py= is not regenerated (the new scripts are not in its scripts list).
+
 * Architecture
 
 A CBM leaf is a =cbmProc.spcs= pointer (=capabilityName= + =cbsSpec=) to a CBS in this package, gated by
@@ -71,7 +83,8 @@ Everything in the plan: no CBS, leaf or sbom exists. Validation needs a rawBisos
   codes; the CBS must verify (=pip list -e=, import). Details in the AI-Outputs ledger.
 - Out-of-chain record (pointer): the 2026-11-04 findings behind these decisions are four entries in
   =blee-binders/evolution/aiActivity-outputs/_nodeBase_/AI-Outputs.org= (under version control,
-  uncommitted when written; actionable when =lcnt=, =pycs=, =qmailSvc=, =gnome= and
+  uncommitted when written; and, since 2026-11-12, a fifth: =rawBisos-sbom.pcs= lists eight pip packages
+  as repo paths, =REPO: bisos/bsip4=; actionable when =lcnt=, =pycs=, =qmailSvc=, =gnome= and
   =bisos-pip/ftoProc.sh= are fixed).
   The evidence for the failing packages and the =fullyMaterialize= run is in
   =bisos-pip/capability/AI-WorkPlan.org= Stage 4.

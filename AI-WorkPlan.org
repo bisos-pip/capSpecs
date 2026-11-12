@@ -157,6 +157,30 @@ sbom split per the =cbm-authorship= skill (service/usage/bundle); the leaf
 =available=); whether =induct/= gets an =ftoBranchProc.spcs= so that the =collective/= walk visits it
 (it has none today, and only =vscodeClaude= is a real CBM there).
 ----- Results: ------
+2026-11-12 (Claude; layout proposed and agreed with the user, then written; not marked DONE):
+- Layout, as agreed (all in =auth=; modelled on the lcnt and vscodeClaude CBMs):
+  - =py3/bin/pltfrmDevelBecome-cbs.pcs=: =seedType="induct"=, =materialize=None=, plants =cba-sysd.cs=.
+  - =py3/bin/pltfrmDevelBecome-sbom.pcs=: no packages. The service/usage/bundle trio does not apply, and
+    =cbs_materialize= runs the sbom before the assemble, while the =rawBisos-sbom.pcs= packages need
+    =dev-bisos3= and the clones first: they are a step of the assemble (=<<2.6>>=).
+  - =py3/bin/pltfrmDevelBecome-assemble.cs=: =fullCheck= (read-only, never fails: the mode, =dev-bisos3=,
+    the alias, the four known failures) and =fullUpdate=, which for now changes nothing and fails loudly.
+    Its steps are =<<2.3>>= to =<<2.7>>=.
+  - =py3/bisos/capSpecs/pltfrmDevelBecomeInfo.py=: pure facts (alias =mb2_github=, override
+    =PLTFRM_DEVEL_GIT_ALIAS=, the repo roots, =dev-bisos3=, =knownNotInstalling=, =bxReposMode()=).
+  - =py3/bin/cbmProc-pltfrmDevelBecome.spcs= (absolute =cbsSpec=), copied as =cbmProc.spcs= to the leaf
+    =bro_rawBisosPlatform/sys/cbm/collective/induct/pltfrmDevelBecome/= with =cbmProc.control=
+    =available=.
+  - No =ftoBranchProc.spcs= in =induct/= for now: the =collective/= walk would not reach it, and a slow,
+    mutating, order-sensitive CBM must not be reachable from =fullyMaterialize= by accident.
+- Tested here (this host is already in devel mode, so only read-only paths): =fullCheck= reports
+  =/bisos/git/bxRepos= -> auth, =dev-bisos3= present; =fullUpdate= fails with a usage error and changes
+  nothing; sbom lists no packages; =cbs_type= prints =induct=; the leaf shows the =cbm_*= menu,
+  =cbm_control= prints =available=, and =cbm_materialize= skips and logs it.
+- Not done: the =null-*= scaffold files are still there (to remove, or =git mv=, once the real steps
+  exist);
+  =py3/setup.py= is not regenerated, so the new scripts are not yet in its =scripts= list (it needs
+  =bx-dblock= and the user's Emacs); no README or panel update; nothing on a rawBisos VM.
 ** TODO [#A] <<2.3>> Precondition check: the git alias
 :PROPERTIES:
 :REPO: this
@@ -164,6 +188,22 @@ sbom split per the =cbm-authorship= skill (service/usage/bundle); the leaf
 A step that checks the ssh Host alias from Stage 3 (name taken from a parameter, default =mb2_github=)
 and stops with a clear message when it does not authenticate. It never writes =~/.ssh/config=.
 ----- Results: ------
+2026-11-12 (Claude; not marked DONE):
+- =pltfrmDevelBecome-assemble.cs -i gitAliasCheck [alias]=: the alias is the argument, else
+  =PLTFRM_DEVEL_GIT_ALIAS=, else =mb2_github=. Prints one line and fails with a usage error and a hint
+  unless it authenticates. The logic is =pltfrmDevelBecomeInfo.aliasState()= (read-only): =ssh -G= says
+  whether a Host entry exists (hostname other than the alias itself), then =ssh -T -o BatchMode=yes
+  git@<alias>= is classified as ok, notDefined, authFailed, hostKeyUnknown, unreachable, noSsh or other.
+  =fullCheck= stays offline: it names the alias and points to this command.
+- Tested with a stub =ssh= on =PATH= (scratchpad, contacts nothing): ok, notDefined, authFailed,
+  hostKeyUnknown
+  and unreachable each give the expected line and exit state, and an alias argument overrides the
+  default.
+- Not done: no live run. Claude did not read =~/.ssh/config= (the user's permission settings denied
+  it) and
+  did not try the real alias; run =pltfrmDevelBecome-assemble.cs -i gitAliasCheck= on a host that has it.
+  =fullUpdate= does not call this check yet (it fails first anyway); 2.4 will call it before the git
+  step.
 ** TODO [#A] <<2.4>> Git step: anon to auth
 :PROPERTIES:
 :REPO: this
@@ -173,6 +213,33 @@ and stops with a clear message when it does not authenticate. It never writes =~
 the symlink switch is its own step (it changes what every later path means). Keep the =# done= markers
 of =bxRepos-gitist.pcs= in mind: they are stale (=bisos/bsip4=, not this repo).
 ----- Results: ------
+2026-11-12 (Claude; decisions with the user: "complete" means every repo, all cloned writable in auth;
+the switch to auth refuses on any gap; the symlink is its own step; not marked DONE):
+- Three Cmnds in =pltfrmDevelBecome-assemble.cs=, logic in =pltfrmDevelBecomeInfo.py=:
+  - =gitReposCheck=: read-only and offline (about 3 s). The repos are the registry
+    (=bx-gitReposBases -i pbdVerify= in auth mode, which prints =<path> Missing -- Un-Expected= for a
+    gap) plus the list of =bxRepos-gitist.pcs=. Each must have a =.git= and an =origin= of the form
+    =git@<alias>:= (writable, not https). Plain registry directories (overview dirs) are not repos.
+  - =gitAnonToAuth=: =gitAliasCheck= first; then =pbdUpdate all= and =bxRepos-gitist.pcs -i
+    csCmndEval all=
+    (with =vcMode=auth bxReposBaseDir gitLabel= in its environment, because it otherwise takes the mode
+    from where the link points); one log per step in =/tmp/pltfrmDevelBecome/= (=PLTFRM_DEVEL_LOGDIR=);
+    the exit codes are not trusted: it ends with =gitReposCheck=. Never touches the link.
+  - =gitSymlinkSwitch [auth|anon]=: default auth; atomic (=symlink= then =rename=), verified by
+    =readlink=,
+    idempotent, never replaces a real directory; to auth only when the check is clean, else it refuses.
+    Stage 4's UnBecome can reuse =bxReposSwitch()=.
+- =fullUpdate= now runs the alias check, =gitAnonToAuth= and the switch, then still ends with the loud
+  "pip steps 2.5 to 2.7 not implemented" failure.
+- Tested: =gitReposCheck= on this host (real data) checks 190 clones and finds *one gap*:
+  =bisos-pip/bootstrap/dev/bisos/bootstrap-vagrants= is in the registry but not cloned in auth, so this
+  hand-switched host is not "complete" by the new definition. The refusal was shown on a scratch link
+  (=PLTFRM_DEVEL_BXREPOS_LINK=): the link stayed on anon. With the problems list stubbed: switch to auth,
+  again (already), back to anon, refusal with a problem, a bad mode, and a real directory in the way all
+  behave. The real =/bisos/git/bxRepos= was not touched (it points to auth).
+- Not done: =gitAnonToAuth= was not run live (it pulls every clone with the user's credentials), so
+  =pbdUpdate= and the gitist clones are untested here; that is 2.10 on a VM. Whether =pbdUpdate= clones
+  the missing =bootstrap-vagrants= is open. The =# done= markers of =bxRepos-gitist.pcs= are not used.
 ** TODO [#A] <<2.5>> Pip step: dev-bisos3 venv and editable installs
 :PROPERTIES:
 :REPO: this
@@ -182,6 +249,29 @@ Create =dev-bisos3= (=bisosPyVenvSetup.sh -i pyVenv_DevSetup=), then a loop over
 only =profile=). One log per package; a package counts as installed only if =pip list -e= shows it.
 Order: =b= first. Consider a pinned list instead of a glob.
 ----- Results: ------
+2026-11-12 (Claude; decisions with the user: skip a package that is already editable; any other package
+that does not end up editable fails the step; not marked DONE):
+- Three Cmnds in =pltfrmDevelBecome-assemble.cs=, logic in =pltfrmDevelBecomeInfo.py=:
+  - =pipCheck=: read-only. The expected set is every =auth/bisos-pip/*/py3= with a =pypiProc.sh= (a glob,
+    not a pinned list); each must be in =pip list -e --format=json= of =dev-bisos3= with its location
+    under =auth=. =lcnt=, =pycs=, =qmailSvc=, =gnome= are reported as skipped when not editable. Also
+    =from bisos import b=. Fails on any other gap.
+  - =pipVenvEnsure=: =bisosPyVenvSetup.sh -i pyVenv_DevSetup= only when the venv is absent; checks it
+    exists afterwards.
+  - =pipEditableInstalls=: the venv, then =pypiProc.sh -i pkgReInstall edit <venv>= (run in the package's
+    =py3=) for each package not yet editable from =auth=, =namespace= and =b= first, then alphabetical;
+    one log each in =/tmp/pltfrmDevelBecome/pip-<name>.log=; exit codes not trusted: =pipCheck= decides.
+- =fullUpdate= now runs the git steps, then =_pipInstalls=, and still ends with the loud "2.6 and 2.7 not
+  implemented" failure.
+- Tested on this host (real): =pipCheck= and =pipEditableInstalls= both find 71 of 74 editable, skip
+  gnome, pycs, qmailSvc, install nothing, and =from bisos import b= is ok. (=lcnt= is editable here: it
+  was installed in the lcnt session.) Install and failure paths with stubs (scratch tree, a fake =pip=,
+  a stub =pypiProc.sh=; env =PLTFRM_DEVEL_VENV=, =_PACKAGES_ROOT=, =_PYPIPROC=): order namespace, b,
+  alpha; a package whose "install" exits 0 but installs nothing fails the step; a second run retries only
+  that one; the known one is skipped; an absent venv fails with a clear line.
+- Not done: no real =pkgReInstall= or venv creation (this host is complete; a fresh platform needs a VM,
+  2.10); =pkgReInstall= dirties each repo it reinstalls (=py3/README.rst=, =py3/_description.org=, see
+  2.9, open); whether the four known failures still fail is 2.8; the =lcnt= case shows the list is stale.
 ** TODO [#A] <<2.6>> The packages of rawBisos-sbom.pcs
 :PROPERTIES:
 :REPO: this
@@ -190,6 +280,38 @@ Make =rawBisos-sbom.pcs='s pip packages present in =dev-bisos3=: local when a cl
 =bxRepos-gitist.pcs= adds: gitist, vscodeClaude, devpi, geneweb, gitlab, grafana, kafka, postgres,
 prometheus, pypiserver), PyPI otherwise. Decide whether this is a step of this CBS or a use of that sbom.
 ----- Results: ------
+2026-11-12 (Claude; decisions with the user: read the list with =pipPkgs_list=; add the ledger entry; not
+marked DONE):
+- Decided: a /use/ of the sbom's list as data, never a run of it. =rawBisos-sbom.pcs= has no venv
+  ("pip taken
+  from PATH"), and an update could replace an editable install with a PyPI copy. Its apt packages
+  (bc, whois,
+  htop, xclip, xdotool, evince, ...) are the rawBisos install's, not the developer platform's.
+- Two Cmnds in =pltfrmDevelBecome-assemble.cs=, logic in =pltfrmDevelBecomeInfo.py=:
+  - =rawBisosPipCheck=: read-only. =rawBisos-sbom.pcs -i pipPkgs_list= gives the 18 entries; each is
+    mapped
+    to its =bisos-pip= clone (=bisos.x= or =bisos-pip/x=, matched case-insensitively) and must be
+    editable
+    from =auth= in =dev-bisos3=; an entry with no clone must be installed (from PyPI). Fails on any gap.
+  - =rawBisosPipInstalls=: =pip install <name>= from PyPI, with a log, only for an entry that has no
+    clone
+    and is not installed; =pip show= decides. An entry that has a clone but is not editable is not fixed
+    here: that is the pip step (2.5).
+- =fullUpdate= now ends with this step, then still the loud "2.7 not implemented" failure.
+- Found: eight of the 18 entries are repo paths (=bisos-pip/devpi= ...), not pip names; pip rejects them.
+  Recorded in the AI-Outputs ledger (=:REPO: bisos/bsip4=; =blee-binders/evolution=, auth only,
+  uncommitted); the check maps them to their clones, so it is unaffected.
+- Tested on this host (real): both Cmnds report 18 entries, 18 editable, none from PyPI, and the
+  note about
+  the eight repo paths. With stubs (a fake =pip=, a stub sbom printing noise before its list): an
+  empty venv
+  fails naming all three entries; case-insensitive matching (=bisos.Alpha= to =alpha=) and a
+  repo-path entry
+  (=bisos-pip/b=) resolve; an entry with no clone is installed from PyPI by the second Cmnd and then
+  passes.
+- Not done: no real PyPI install (nothing on this host needs one: all 18 have clones), and no run of
+  the sbom
+  itself, by design.
 ** TODO [#A] <<2.7>> Verify, and report real failure
 :PROPERTIES:
 :REPO: this
@@ -198,6 +320,39 @@ prometheus, pypiserver), PyPI otherwise. Decide whether this is a step of this C
 worked around in =bisos.b=): the CBS must itself check and exit non-zero. Checks: =from bisos import b=
 in =dev-bisos3=, =rawBisos-sbom.pcs= runs, every package that must be editable is, a summary table.
 ----- Results: ------
+2026-11-12 (Claude; decisions with the user: =fullCheck= stays offline, with no alias row; a minimal
+import
+check, =from bisos import b=, for now; not marked DONE):
+- =fullCheck= is now the verification of the whole platform: read-only, offline, one summary table with a
+  state per row: bxRepos mode (the link points to auth), git repos (=gitReposCheck=), venv, pip
+  (=pipCheck=),
+  rawBisos sbom (=rawBisosPipCheck=; its =pipPkgs_list= runs), import b. It prints
+  =pltfrmDevelBecome: complete=
+  or =NOT complete, failed: <rows>= and raises a usage error. The alias is not a row (network,
+  credentials):
+  =gitAliasCheck=, which =fullUpdate= runs first. The pip row also fails when the import fails
+  (=pipCheck=
+  includes it), so two rows can fail for one cause.
+- =fullUpdate=: git steps, pip step, rawBisos step, then =fullCheck=. The loud "not implemented"
+  placeholder
+  is gone.
+- *Exit status*: neither Cmnd exits non-zero on failure. =g_csMain= exits 0 even when a Cmnd fails
+  (verified
+  on the real run: the failing =fullCheck= exited 0), the known limitation that is not to be worked
+  around
+  in =bisos.b=. So the verdict is the text (=complete= or =NOT complete=) and the usage error; a caller
+  (=cbmProc.status=, the walker) must not trust the exit code. This is how lcntBases and the other CBSs
+  verify themselves.
+- Tested on this host (real): =fullCheck= fails on one row, git repos (the =bootstrap-vagrants= gap
+  of 2.4);
+  the other five are OK (mode auth, =dev-bisos3=, 71 of 74 editable, 18 rawBisos entries, import b).
+  With stubs (a scratch platform: fake =pip= and registry, a link, a stub sbom): all six rows OK gives
+  =complete=; each row failing alone (git gap, link not auth, absent venv, a rawBisos entry with no
+  clone, a
+  failing import) gives the expected rows and =NOT complete=.
+- Not done: no run on a rawBisos VM (2.10); =fullUpdate= was not run live (the git step pulls with
+  the user's
+  credentials); no per-package import beyond =bisos.b= (minimal, as decided).
 ** TODO [#B] <<2.8>> Known failures: lcnt, pycs, qmailSvc, gnome
 :PROPERTIES:
 :REPO: lcnt, pycs, qmailSvc, gnome (and the pypiProc.sh machinery)

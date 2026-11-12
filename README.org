@@ -103,7 +103,36 @@ After a rawBisos install, and with the credentials in place, becomes a developer
 3) Verification: =from bisos import b= works in =dev-bisos3=, =rawBisos-sbom.pcs= runs, and every package
    that should be editable is.
 
-/Planned: today these steps are run by hand./
+It is the slow, idempotent build, and each step skips what is already done. The files are
+=pltfrmDevelBecome-cbs.pcs=, =pltfrmDevelBecome-sbom.pcs= (no packages), =pltfrmDevelBecome-assemble.cs=
+and the leaf pointer =cbmProc-pltfrmDevelBecome.spcs=. The leaf is
+=sys/cbm/collective/induct/pltfrmDevelBecome/=, planted =available=: enable it with =cbm_enable=.
+
+#+begin_src bash
+pltfrmDevelBecome-assemble.cs -i fullCheck      # read-only, offline: one summary table
+pltfrmDevelBecome-assemble.cs -i gitAliasCheck  # the ssh alias authenticates (network)
+pltfrmDevelBecome-assemble.cs -i fullUpdate     # the steps below, then fullCheck
+#+end_src
+
+| Command               | Step                                                                        |
+|-----------------------+-----------------------------------------------------------------------------|
+| =gitAliasCheck=       | The precondition: the ssh Host alias resolves and authenticates             |
+| =gitReposCheck=       | Read-only: every repo cloned in =auth= and writable (origin =git@<alias>:=) |
+| =gitAnonToAuth=       | =pbdUpdate= and the gitist clones, then the check                           |
+| =gitSymlinkSwitch=    | =/bisos/git/bxRepos= to =auth=; refuses unless the repos are complete       |
+| =pipCheck=            | Read-only: every package editable from =auth=, and =from bisos import b=    |
+| =pipVenvEnsure=       | Create =dev-bisos3= when absent                                             |
+| =pipEditableInstalls= | =pkgReInstall edit= for each package not yet editable                       |
+| =rawBisosPipCheck=    | Read-only: the =pipPkgs_list= of =rawBisos-sbom.pcs= is in =dev-bisos3=     |
+| =rawBisosPipInstalls= | PyPI install of an entry that has no clone (never runs the sbom)            |
+| =fullCheck=           | The summary of all of the above, offline                                    |
+| =fullUpdate=          | The steps, then =fullCheck=                                                 |
+
+The alias is a parameter: an argument of =gitAliasCheck=, else =PLTFRM_DEVEL_GIT_ALIAS=, else
+=mb2_github=. The four packages that do not install editable (=lcnt=, =pycs=, =qmailSvc=, =gnome=) are
+skipped and reported. The verdict is the text =pltfrmDevelBecome: complete= or
+=NOT complete, failed: ...=: =g_csMain= exits 0 on failure, so do not trust the exit code.
+/Not yet run on a rawBisos VM./
 
 ** pltfrmDevelUnBecome
 
@@ -151,8 +180,12 @@ cd py3 && ./pypiProc.sh -i pkgReInstall edit /bisos/venv/py3/dev-bisos3
 
 * Key Files
 
-- [[file:./py3/bin/null-cbs-induct.cs]] --- the placeholder CBS for an induct capability, to be replaced by one
-  per capability.
+- [[file:./py3/bin/pltfrmDevelBecome-assemble.cs]] --- the steps and checks of the developer platform
+  (=-cbs.pcs=, =-sbom.pcs= and =cbmProc-pltfrmDevelBecome.spcs= are beside it).
+- [[file:./py3/bisos/capSpecs/pltfrmDevelBecomeInfo.py]] --- its pure facts: alias, repo roots, venv,
+  the known failures, and the checks.
+- [[file:./py3/bin/null-cbs-induct.cs]] --- the placeholder CBS for an induct capability, to be
+  replaced by one per capability.
 - [[file:./py3/bin/null-assemble.cs]] --- the placeholder assemble step.
 - [[file:./py3/bin/null-binsPrep.cs]] --- the placeholder binsPrep step.
 - [[file:./py3/bisos/capSpecs/][py3/bisos/capSpecs/]] --- the Python modules of the CBSs and their sboms.
@@ -177,7 +210,7 @@ author/maintainer\\
 * Planned Improvements
 
 - TODO pltfrmDevelCreds: specify and implement the credentials CBM.
-- TODO pltfrmDevelBecome: specify and implement the developer-platform CBM.
+- TODO pltfrmDevelBecome: run it on a rawBisos VM, enable the leaf, and settle the known failures.
 - TODO pltfrmDevelUnBecome: specify and implement the fast anon/devel switch.
 - TODO Replace the =null-*= placeholders with real CBSs, sboms and assemble steps.
 - TODO Add further capabilities that live in BISOS but have no package of their own.

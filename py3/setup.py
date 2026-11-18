@@ -43,7 +43,7 @@ def longDescription():
 # b:py3:pypi:setup/version Arguments  :forSys t :forPyPi t :constant "666"
 ####+BEGIN: b:py3:pypi:setup/version :comment "Auto Detected"
 
-# ./pypiUploadVer DID NOT exist -- forPypiVersion=0.11 -- forLocalVersion=0.1 -- constant=NA
+# ./pypiUploadVer DID NOT exist -- forPypiVersion=0.12 -- forLocalVersion=0.1 -- constant=NA
 def pkgVersion():
         return '0.1'
 
@@ -52,7 +52,7 @@ def pkgVersion():
 # b:py3:pypi:setup/requires :extras ; :requirements "requirements.txt" (bring here requirements.txt)
 ####+BEGIN: b:py3:pypi:setup/requires :extras ()
 
-requires = [
+requires = [ 
 "bisos",
 "bisos.b",
 "bisos.banna",
@@ -60,25 +60,43 @@ requires = [
 "bisos.capability",
 "bisos.common",
 "bisos.csPlayer",
+"bisos.sbom",
+"pip",
 "setuptools==75.8.0",
+"wheel==0.38.4",
 ]
 ####+END:
 
 # b:py3:pypi:setup/scripts :comment
 ####+BEGIN: b:py3:pypi:setup/scripts :comment ""
 
-scripts = [
+scripts = [ 
+'bin/blee31Build-assemble.cs',
+'bin/blee31Build-cbs.pcs',
+'bin/blee31Build-sbom.pcs',
+'bin/bleeBuild-cbs.pcs',
+'bin/cbmProc-bleeBuild.spcs',
+'bin/cbmProc-emacsSrcBuild.spcs',
+'bin/cbmProc-pltfrmDevelBecome.spcs',
+'bin/emacs31SrcBuild-assemble.cs',
+'bin/emacs31SrcBuild-cbs.pcs',
+'bin/emacs31SrcBuild-sbom.pcs',
+'bin/emacsSrcBuild-cbs.pcs',
 'bin/null-assemble.cs',
-'bin/null-binsPrep.cs',
 'bin/null-cbs-induct.cs',
+'bin/null-cbs-induct.pcs',
+'bin/null-sbom.pcs',
+'bin/pltfrmDevelBecome-assemble.cs',
+'bin/pltfrmDevelBecome-cbs.pcs',
+'bin/pltfrmDevelBecome-sbom.pcs',
 ]
 ####+END:
 
 # b:py3:pypi:setup/dataFiles :comment
 ####+BEGIN: b:py3:pypi:setup/dataFiles :comment "Instead of ./MANIFEST.in or in pyproject.toml"
 
-data_files = [
-(' ',  ['lh-agpl3-LICENSE.txt', '_description.org', 'README.rst']),
+data_files = [ 
+('',  ['lh-agpl3-LICENSE.txt', '_description.org', 'README.rst']),
 ]
 ####+END:
 

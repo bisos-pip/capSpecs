@@ -196,10 +196,12 @@ def _fullCheck() -> bool:
     failedRows = [name for name, ok, _ in results if not ok]
     if failedRows:
         print(f"blee31Build: NOT complete, failed: {', '.join(failedRows)}")
+        print(f"blee31Build verify: fail {', '.join(failedRows)}")   # read by bisos.capability cbm_verify
         b_io.eh.problem_usageError(f"blee31Build is not complete: failed {failedRows}")
         return False
     print(f"blee31Build: complete (Blee {info.profile} on Emacs {version}; switch with: "
           f"blee -p emacs={info.emacsMajor()} -i run {info.profile})")
+    print("blee31Build verify: ok")   # read by bisos.capability cbm_verify
     return True
 
 

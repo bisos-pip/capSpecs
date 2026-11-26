@@ -26,6 +26,11 @@ Note to a fresh Claude: this file is intentionally sparse at project start.
 Fill in the sections below when asked to update, following the structure provided.
 
 * Current State
+- 2026-11-26 (from a bisos-pip/b session; uncommitted, not released): emacs31SrcBuild, blee31Build
+  and pltfrmDevelBecome =fullCheck= end with =<name> verify: ok|fail ...= after their complete / NOT
+  complete line, read by bisos.capability's =cbm_verify= (bisos-pip/capability AI-WorkPlan.org Stage
+  5); their =cbmProc-<name>.spcs= declare it as =verifySpec=. Separately, the same day:
+  =setAsDefault= links emacsclient (AI-WorkPlan.org =<<1.2>>=).
 
 As of 2026-11-04 nothing is implemented. =bisos.capSpecs= is a scaffold (=py3/bin/null-cbs-induct.cs=,
 =null-assemble.cs=, =null-binsPrep.cs=, an empty =py3/bisos/capSpecs/__init__.py=); it is installed

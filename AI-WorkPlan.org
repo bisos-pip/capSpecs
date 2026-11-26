@@ -112,6 +112,20 @@ Deferred by the user in Stage 5. Today =/usr/local/bin/emacsclient= is absent, s
 script's own way (=setAsDefault='s =bleeclient emacsClientMatchingSet=) links a terminal when not run
 from inside Emacs (AI-Outputs ledger, 2026-11-12).
 ----- Results: ------
+- 2026-11-26 (from a bisos-pip/b session), decided by Mohsen: =emacsSrcBuild= does it, with the
+  default Emacs. Seen again in the fresh Debian 13 container run of that day: =client link FAIL
+  /usr/local/bin/emacsclient -> /usr/bin/bash= (bxGenesis/start =<<3.6>>=).
+- bisos/blee =bin/lcaEmacsSrcBinsPrep.sh= =setAsDefault= no longer calls =bleeclient
+  emacsClientMatchingSet=: it derives the client of the same build (=emacs-31.1= ->
+  =emacsclient-31.1=, the name =postInstall= gives it) and =setAsDefaultSudo= now links both
+  =/usr/local/bin/emacs= and =/usr/local/bin/emacsclient=. A missing client is an =EH_problem=.
+- =emacs31SrcBuildInfo.clientLinkOk()= requires the link to lead to =emacsclient-31.1= (absent is no
+  longer OK); =emacs31SrcBuild-assemble.cs= =fullUpdate= re-runs =setAsDefault= on an installed host
+  when either link is wrong, so a re-materialize repairs an existing host. README updated.
+- Tested: the path derivation, the script loads and lists its examples, both Python files compile,
+  =fullCheck= (read-only) on the dev host now reports =client link FAIL ... -> absent= (it was OK
+  before). Not run: =setAsDefault= itself (it changes =/usr/local/bin=; the dev host's link was
+  left as is), a container or VM run.
 ** -
 
 

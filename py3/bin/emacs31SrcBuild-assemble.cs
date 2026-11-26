@@ -187,7 +187,7 @@ def _fullCheck() -> bool:
     row("default", info.defaultIsThis(),
         f"{os.path.join(info.binDir(), 'emacs')} -> {info.defaultTarget() or 'ABSENT'} (emacs-{info.fullVersion} wanted)")
     row("client link", info.clientLinkOk(),
-        f"{os.path.join(info.binDir(), 'emacsclient')} -> {info.clientLinkTarget() or 'absent'} (absent or an emacsclient)")
+        f"{os.path.join(info.binDir(), 'emacsclient')} -> {info.clientLinkTarget() or 'absent'} (emacsclient-{info.fullVersion} wanted)")
 
     print("emacs31SrcBuild: summary")
     for name, ok, detail in results:
@@ -195,9 +195,11 @@ def _fullCheck() -> bool:
     failedRows = [name for name, ok, _ in results if not ok]
     if failedRows:
         print(f"emacs31SrcBuild: NOT complete, failed: {', '.join(failedRows)}")
+        print(f"emacs31SrcBuild verify: fail {', '.join(failedRows)}")   # read by bisos.capability cbm_verify
         b_io.eh.problem_usageError(f"emacs31SrcBuild is not complete: failed {failedRows}")
         return False
     print("emacs31SrcBuild: complete")
+    print("emacs31SrcBuild verify: ok")   # read by bisos.capability cbm_verify
     return True
 
 
@@ -208,7 +210,7 @@ def _fullUpdate(force: bool) -> bool:
         return False
     if info.installed() and not force:
         print(f"emacs31SrcBuild: emacs {info.fullVersion} is installed: build skipped (force rebuilds)")
-        steps = ["setAsDefault"] if not info.defaultIsThis() else []
+        steps = ["setAsDefault"] if not (info.defaultIsThis() and info.clientLinkOk()) else []
     else:
         steps = info.steps
     for step in steps:

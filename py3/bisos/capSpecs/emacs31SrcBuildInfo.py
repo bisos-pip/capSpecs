@@ -143,11 +143,11 @@ def clientLinkTarget() -> str:
 
 
 def clientLinkOk() -> bool:
-    """binDir/emacsclient is absent (PATH falls through to Debian's) or leads to an emacsclient. The script's
-    setAsDefault ends with bleeclient emacsClientMatchingSet, which, when not run from a shell inside Emacs,
-    takes another program for the Emacs server: seen 2026-11-12, emacsclient -> /usr/bin/xfce4-terminal."""
-    target = clientLinkTarget()
-    return not target or os.path.basename(target).startswith("emacsclient")
+    """binDir/emacsclient leads to this build's emacsclient-31.1, as binDir/emacs leads to emacs-31.1: the
+    script's setAsDefault links both (since 2026-11-26). Before, it linked the client with bleeclient
+    emacsClientMatchingSet, which takes the version from the running Emacs server and, with none, took another
+    program: seen emacsclient -> /usr/bin/xfce4-terminal (2026-11-12) and -> /usr/bin/bash (a container)."""
+    return os.path.basename(clientLinkTarget()) == f"emacsclient-{fullVersion}"
 
 
 def defaultIsThis() -> bool:

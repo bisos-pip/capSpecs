@@ -346,9 +346,11 @@ def _fullCheck() -> bool:
     failedRows = [name for name, ok, _ in results if not ok]
     if failedRows:
         print(f"pltfrmDevelBecome: NOT complete, failed: {', '.join(failedRows)}")
+        print(f"pltfrmDevelBecome verify: fail {', '.join(failedRows)}")   # read by bisos.capability cbm_verify
         b_io.eh.problem_usageError(f"pltfrmDevelBecome is not complete: failed {failedRows}")
         return False
     print("pltfrmDevelBecome: complete")
+    print("pltfrmDevelBecome verify: ok")   # read by bisos.capability cbm_verify
     return True
 
 

@@ -169,7 +169,7 @@ The steps are =srcEnvSetup=, =srcPkgObtain= (skipped when the sources are there)
 =srcBinInstall=, =postInstall= and =setAsDefault=, with one log each in =/tmp/emacs31SrcBuild/=.
 =fullCheck= requires =deb-src=, the sources, =emacs-31= and =emacsclient-31= reporting 31.1, native
 compilation and tree-sitter available, =/usr/local/bin/emacs= leading to =emacs-31.1=, and
-=/usr/local/bin/emacsclient= absent or an emacsclient. The verdict is the text
+=/usr/local/bin/emacsclient= leading to =emacsclient-31.1=. The verdict is the text
 =emacs31SrcBuild: complete= or =NOT complete=. If the clone fails, =fullUpdate= stops; run it again.
 Materialized on a container (2026-11-12, about 10 minutes on 96 cores); not yet on a VM or a box.
 
